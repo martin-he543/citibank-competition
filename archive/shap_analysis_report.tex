@@ -1,0 +1,68 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=1in}
+\title{Model Interpretability with SHAP: Explaining Dropout Risk}
+\author{Bayes Business School}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Understanding why a predictive model classifies a student as at risk of dropout is as important as the prediction itself. To this end, we employ SHAP (SHapley Additive exPlanations) to decompose individual predictions and provide transparent, actionable insights into the drivers of dropout risk.
+
+\section{Why SHAP?}
+SHAP values offer a principled, game-theoretic approach to model interpretability. They attribute the prediction for each student to individual features, quantifying both the direction and magnitude of each feature's impact. This allows us to:
+\begin{itemize}
+    \item Identify the most influential predictors of dropout
+    \item Understand heterogeneity in risk factors across students
+    \item Communicate model decisions to stakeholders in an interpretable way
+\end{itemize}
+
+\section{SHAP Analysis Workflow}
+We focus on the final-stage (Stage 4) model, which leverages the richest set of features. The workflow is as follows:
+\begin{enumerate}
+    \item Fit the best-performing model (e.g., Random Forest or Stacking Ensemble) on the Stage 4 cohort.
+    \item Use the SHAP TreeExplainer to compute SHAP values for a representative sample of students.
+    \item Visualize global and local feature importances.
+\end{enumerate}
+
+\section{Global Feature Importance}
+The bar plot below summarizes the average absolute SHAP value for each feature, indicating its overall contribution to dropout risk across the cohort.
+
+% Placeholder for SHAP bar plot
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_shap_bar.png}
+    \caption{Global feature importance for dropout risk (mean absolute SHAP values).}
+\end{figure}
+
+\section{Feature Impact Distribution}
+The SHAP summary plot below shows the distribution of SHAP values for each feature, revealing both the direction and spread of their effects. Each point represents a student, colored by the feature value.
+
+% Placeholder for SHAP summary plot
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_shap_summary.png}
+    \caption{SHAP value distribution for top features. Red indicates high feature values, blue indicates low.}
+\end{figure}
+
+\section{Interpretation and Insights}
+\begin{itemize}
+    \item \textbf{Key drivers:} Features such as final grade, session attendance, and forum engagement consistently emerge as the most influential predictors of dropout risk.
+    \item \textbf{Directionality:} Higher grades and engagement reduce dropout risk (negative SHAP values), while low engagement or poor grades increase it.
+    \item \textbf{Heterogeneity:} SHAP reveals that the same feature can have different impacts for different students, supporting personalized intervention strategies.
+\end{itemize}
+
+\section{Limitations and Future Directions}
+\begin{itemize}
+    \item SHAP explanations are most reliable for tree-based models; deep neural networks may require alternative explainers.
+    \item Further work could explore local explanations for individual at-risk students, or compare SHAP results across different model families and stages.
+\end{itemize}
+
+\section{Conclusion}
+SHAP analysis provides a transparent, quantitative framework for understanding model predictions. By surfacing the most important risk factors, it enables data-driven, interpretable, and targeted interventions to reduce student dropout.
+
+\end{document}

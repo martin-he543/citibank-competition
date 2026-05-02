@@ -1,0 +1,106 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=1in}
+\title{Survival Analysis of Student Dropout: A Staged Cohort Approach}
+\author{Bayes Business School}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Student dropout is a critical challenge in higher education, with significant implications for both institutions and learners. Traditional predictive models often treat dropout as a static binary outcome, but this approach can obscure the temporal and structural nature of student disengagement. In this report, we employ a survival analysis framework, leveraging staged cohort modeling to capture the dynamics of dropout risk as students progress through key programme milestones.
+
+\section{Rationale for Survival Analysis}
+Unlike standard classification, survival analysis explicitly models the timing and stages of dropout. In our dataset, missingness is not random: students who leave the programme cease to generate new data, resulting in left-censored records. By aligning our analysis with tuition-fee checkpoints and academic milestones, we can:
+\begin{itemize}
+    \item Identify when students are most at risk of dropping out
+    \item Tailor interventions to specific stages
+    \item Avoid misleading imputations for data that could not have existed
+\end{itemize}
+
+\section{Staged Cohort Construction}
+We define four longitudinal stages, each corresponding to a set of available features and a tuition-fee checkpoint:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+Stage & Columns Available & Cohort \\
+\midrule
+Stage 1 & Session 1, 2; Test 1; Forum/Office-Hours (amortised $\div$ 4) & Full cohort \\
+Stage 2 & + Session 3, 4; Test 2; Forum/Office-Hours ($\div$ 2) & Survived Stage 1 \\
+Stage 3 & + Session 5; Test 3; Forum/Office-Hours ($\times 3/4$) & Survived Stage 2 \\
+Stage 4 & + Ind CW, Group CW, Final Grade; Full Forum/Office-Hours & Survived Stage 3 \\
+\bottomrule
+\end{tabular}
+\caption{Programme stages and available features at each checkpoint.}
+\end{table}
+
+\section{Kaplan--Meier Survival Curve}
+To visualize the proportion of students remaining at each stage, we construct a Kaplan--Meier style survival curve. This approach mirrors clinical trials, tracking the fraction of the cohort still enrolled after each milestone.
+
+% Placeholder for survival curve figure
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_survival_curve.png}
+    \caption{Kaplan--Meier style survival curve showing student retention at each programme stage.}
+\end{figure}
+
+\section{Staged Predictive Modeling}
+At each stage, we fit a dedicated predictive model using only the data available up to that point:
+\begin{itemize}
+    \item \textbf{Stage 1:} Logistic Regression (interpretable, low complexity)
+    \item \textbf{Stage 2:} Random Forest (captures non-linearities)
+    \item \textbf{Stage 3:} Histogram Gradient Boosting (handles missingness natively)
+    \item \textbf{Stage 4:} Stacking Ensemble (leverages all information)
+\end{itemize}
+Each model is trained on the sub-cohort that survived to that stage, predicting subsequent dropout.
+
+\subsection{Cross-Stage Performance}
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Stage & Model & ROC-AUC (mean $\pm$ std) & PR-AUC (mean $\pm$ std) & Conditional Dropout Rate \\
+\midrule
+% Fill with actual results from stage_results
+Stage 1 & Logistic Regression & 0.XX $\pm$ 0.XX & 0.XX $\pm$ 0.XX & XX\% \\
+Stage 2 & Random Forest & 0.XX $\pm$ 0.XX & 0.XX $\pm$ 0.XX & XX\% \\
+Stage 3 & Hist. Grad. Boosting & 0.XX $\pm$ 0.XX & 0.XX $\pm$ 0.XX & XX\% \\
+Stage 4 & Stacking Ensemble & 0.XX $\pm$ 0.XX & 0.XX $\pm$ 0.XX & XX\% \\
+\bottomrule
+\end{tabular}
+\caption{Model performance and dropout rates at each stage.}
+\end{table}
+
+% Placeholder for performance barplots
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{fig_stage_performance.png}
+    \caption{Barplots of ROC-AUC and PR-AUC for each stage.}
+\end{figure}
+
+\section{Interpretation and Discussion}
+\begin{itemize}
+    \item \textbf{Structural missingness:} Dropout is revealed by the absence of later-stage data, not just by the target label.
+    \item \textbf{Cohort enrichment:} As students progress, the cohort shrinks but the available data per student becomes richer, justifying more complex models at later stages.
+    \item \textbf{Checkpoint alignment:} Dropout spikes align with tuition-fee deadlines, making stage boundaries actionable for intervention.
+    \item \textbf{Amortisation:} Forum and office-hour engagement are divided by the fraction of the programme elapsed, preventing information leakage.
+    \item \textbf{Actionable metrics:} Reporting conditional dropout rates at each stage enables targeted support for at-risk students.
+\end{itemize}
+
+\section{Limitations and Future Work}
+\begin{itemize}
+    \item Confidence intervals for the survival curve can be added using the \texttt{lifelines} package.
+    \item Cox proportional hazards models could provide interpretable continuous-time risk estimates.
+    \item Cascading risk scores from early stages into later models may improve accuracy.
+    \item Clustering within each stage could reveal distinct engagement personas.
+\end{itemize}
+
+\section{Conclusion}
+A staged survival analysis approach provides a principled, interpretable, and actionable framework for understanding and predicting student dropout. By aligning models with programme structure and handling missingness as signal, we enable more effective early warning and intervention strategies.
+
+\end{document}
